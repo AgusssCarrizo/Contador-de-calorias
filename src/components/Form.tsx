@@ -1,14 +1,21 @@
-import {useState} from "react";
+import {useState, Dispatch} from "react";
 import {Activity} from "../types";
-import {ChangeEvent} from "react";
+import {ChangeEvent, FormEvent} from "react";
 import {categories} from "../data/categories";
+import { ActivityActions } from "../reducers/activity-reducer";
 
-export default function Form() {
-   const [activity, setActivity] = useState<Activity>({
-      category: 1,
-      name: "",
-      calories: 0,
-   });
+type FormProps = {
+   dispatch: Dispatch<ActivityActions>;
+};
+
+const initialState = {
+   category: 1,
+   name: "",
+   calories: 0,
+}
+
+export default function Form({dispatch}: FormProps) {
+   const [activity, setActivity] = useState<Activity>(initialState);
 
    const handleChange = (
       e: ChangeEvent<HTMLSelectElement> | ChangeEvent<HTMLInputElement>
@@ -23,11 +30,19 @@ export default function Form() {
 
    const isValidActivity = () => {
       const {name, calories} = activity;
-      console.log(name.trim() !== "" && calories > 0);
+  
       return name.trim() !== "" && calories > 0;
    };
+   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+       dispatch({type: "save-activity", payload: {newActivity: activity}})
+       setActivity(initialState)
+   }
+
+  
    return (
-      <form className="space-y-5 bg-white shadow p-10 rounded-lg">
+      <form className="space-y-5 bg-white shadow p-10 rounded-lg"
+      onSubmit={handleSubmit}>
          <div className="grid grid-cols-1 gap-3">
             <label htmlFor="category" className="font-bold">
                Categoria:
